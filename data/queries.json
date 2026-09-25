@@ -1,0 +1,50 @@
+[
+  {
+    "query": "morning water soil",
+    "expected_doc": "garden"
+  },
+  {
+    "query": "dry beds irrigation",
+    "expected_doc": "garden"
+  },
+  {
+    "query": "renew overdue books",
+    "expected_doc": "library"
+  },
+  {
+    "query": "extend my loan",
+    "expected_doc": "library"
+  },
+  {
+    "query": "protect eyes while soldering",
+    "expected_doc": "workshop"
+  },
+  {
+    "query": "tool behaves unexpectedly",
+    "expected_doc": "workshop"
+  },
+  {
+    "query": "new volunteer orientation",
+    "expected_doc": "volunteers"
+  },
+  {
+    "query": "who helps a newcomer",
+    "expected_doc": "volunteers"
+  },
+  {
+    "query": "find recording timestamp",
+    "expected_doc": "archive"
+  },
+  {
+    "query": "search service unavailable",
+    "expected_doc": "archive"
+  },
+  {
+    "query": "wheelchair entrance ramp",
+    "expected_doc": "events"
+  },
+  {
+    "query": "accommodation before event",
+    "expected_doc": "events"
+  }
+]

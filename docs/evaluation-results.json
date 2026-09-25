@@ -1,0 +1,24 @@
+{
+  "scope": "Small authored development set, not an independent benchmark. Fixture concepts and queries share a domain.",
+  "provider": "fixture-concepts-v1",
+  "metrics": {
+    "lexical": {
+      "hit_at_1": 0.9166666666666666,
+      "hit_at_3": 1.0,
+      "mrr_at_5": 0.9583333333333334,
+      "queries": 12
+    },
+    "vector": {
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "mrr_at_5": 1.0,
+      "queries": 12
+    },
+    "hybrid": {
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "mrr_at_5": 1.0,
+      "queries": 12
+    }
+  }
+}

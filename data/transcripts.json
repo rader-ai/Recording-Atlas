@@ -1,0 +1,188 @@
+[
+  {
+    "id": "garden",
+    "title": "Keeping a community garden healthy",
+    "cues": [
+      {
+        "start": 0,
+        "end": 18,
+        "text": "Water the soil slowly in the early morning. A deeper soaking encourages roots to grow below the surface, where moisture lasts longer."
+      },
+      {
+        "start": 18,
+        "end": 36,
+        "text": "Check beneath the mulch before watering again. The top layer can look dry while the soil below remains damp. More water is not always better."
+      },
+      {
+        "start": 36,
+        "end": 54,
+        "text": "Group plants with similar irrigation needs in the same bed. Label the valves so volunteers can follow the schedule without guessing."
+      },
+      {
+        "start": 54,
+        "end": 72,
+        "text": "When a bed stays dry despite irrigation, inspect the hose and emitter for a blockage before increasing the watering time."
+      },
+      {
+        "start": 72,
+        "end": 90,
+        "text": "Record changes in a shared garden notebook. Include the date, the bed number, and what you observed so the next volunteer has useful context."
+      }
+    ]
+  },
+  {
+    "id": "library",
+    "title": "Borrowing from the neighborhood library",
+    "cues": [
+      {
+        "start": 0,
+        "end": 18,
+        "text": "Books can be borrowed for three weeks. Bring your library card to the checkout desk, or ask a staff member to help locate your account."
+      },
+      {
+        "start": 18,
+        "end": 36,
+        "text": "Renew a loan online before its due date. A renewal is unavailable when another reader has reserved the book. The catalog explains that restriction."
+      },
+      {
+        "start": 36,
+        "end": 54,
+        "text": "If an item is overdue, return it when you can and speak to a staff member. Do not assume that a late return means you cannot borrow again."
+      },
+      {
+        "start": 54,
+        "end": 72,
+        "text": "The public catalog shows whether an item is available. Staff can help you place a hold on a book from another branch."
+      },
+      {
+        "start": 72,
+        "end": 90,
+        "text": "Keep account details private. Volunteers should direct account questions to library staff rather than asking people to share credentials."
+      }
+    ]
+  },
+  {
+    "id": "workshop",
+    "title": "A safe first visit to the maker workshop",
+    "cues": [
+      {
+        "start": 0,
+        "end": 18,
+        "text": "Wear safety goggles when cutting, drilling, or soldering. Eye protection is available beside the entrance, and a volunteer can help check the fit."
+      },
+      {
+        "start": 18,
+        "end": 36,
+        "text": "Before using a tool, complete its short orientation. Having used a similar tool elsewhere does not replace learning this workshop setup."
+      },
+      {
+        "start": 36,
+        "end": 54,
+        "text": "Hot soldering equipment belongs in its stand. Clear loose paper from the work area and wait for equipment to cool before storing it."
+      },
+      {
+        "start": 54,
+        "end": 72,
+        "text": "If a tool behaves unexpectedly, stop using it and tell the workshop lead. Do not repeatedly restart equipment that may have a fault."
+      },
+      {
+        "start": 72,
+        "end": 90,
+        "text": "The sign out sheet records shared equipment use. It helps the team schedule maintenance and investigate a problem without guessing."
+      }
+    ]
+  },
+  {
+    "id": "volunteers",
+    "title": "Welcoming a new volunteer",
+    "cues": [
+      {
+        "start": 0,
+        "end": 18,
+        "text": "New volunteers begin with a twenty minute orientation. We introduce the team, explain the work, and ask what the volunteer hopes to contribute."
+      },
+      {
+        "start": 18,
+        "end": 36,
+        "text": "Pair a newcomer with an experienced volunteer for the first shift. A named contact makes it easier to ask questions before a mistake becomes a problem."
+      },
+      {
+        "start": 36,
+        "end": 54,
+        "text": "Explain which decisions volunteers can make and which need a coordinator. Clear boundaries help people act confidently without taking on authority they do not have."
+      },
+      {
+        "start": 54,
+        "end": 72,
+        "text": "At the end of the first shift, ask what was confusing. Use that feedback to improve the next orientation rather than blaming the newcomer."
+      },
+      {
+        "start": 72,
+        "end": 90,
+        "text": "A welcome message should contain the meeting place, start time, and a contact name. Keep it short enough to read on a phone."
+      }
+    ]
+  },
+  {
+    "id": "archive",
+    "title": "Finding a passage in recorded workshops",
+    "cues": [
+      {
+        "start": 0,
+        "end": 18,
+        "text": "The archive pairs recordings with timestamped transcripts. A search result should take a listener to the relevant passage rather than only the start of a long recording."
+      },
+      {
+        "start": 18,
+        "end": 36,
+        "text": "Caption errors can make search difficult. Keep the original transcript and record corrections so editorial changes remain traceable."
+      },
+      {
+        "start": 36,
+        "end": 54,
+        "text": "People often search with different words than the speaker used. Combine exact keyword matching with a method that can recognize related concepts."
+      },
+      {
+        "start": 54,
+        "end": 72,
+        "text": "When a search service is unavailable, preserve access to the transcript and basic keyword search. A temporary dependency failure should not hide the archive."
+      },
+      {
+        "start": 72,
+        "end": 90,
+        "text": "Give every passage a stable source reference. Editors should be able to check a quotation without trusting a generated summary."
+      }
+    ]
+  },
+  {
+    "id": "events",
+    "title": "Planning an accessible community event",
+    "cues": [
+      {
+        "start": 0,
+        "end": 18,
+        "text": "An accessible entrance should have a clear route from arrival to the event space. Check ramps, door widths, and the location of seating before guests arrive."
+      },
+      {
+        "start": 18,
+        "end": 36,
+        "text": "Publish accommodation information alongside the event details. A person using a wheelchair should not need to guess whether the entrance is usable."
+      },
+      {
+        "start": 36,
+        "end": 54,
+        "text": "Offer a contact for access questions and explain what support is available. Avoid promises that the venue cannot reliably fulfill."
+      },
+      {
+        "start": 54,
+        "end": 72,
+        "text": "Keep pathways clear during the event. A route that worked during setup may become blocked by chairs, bags, or a queue."
+      },
+      {
+        "start": 72,
+        "end": 90,
+        "text": "After the event, ask attendees what made participation easier or harder. Use the answers when choosing the next venue."
+      }
+    ]
+  }
+]
