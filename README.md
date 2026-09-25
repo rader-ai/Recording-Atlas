@@ -2,7 +2,7 @@
 
 **Make recorded knowledge findable again.**
 
-Recording Atlas turns a recording into a timed transcript, a searchable archive, and draft questions that point back to the speaker's words. It runs on your computer and guides you through setup. You can explore an example without creating an account.
+Recording Atlas turns a recording into a timed transcript, a searchable archive, and draft questions that point back to the speaker's words. It runs on your computer and guides you through setup. You can explore an example without an account, transcribe locally with Whisper on a Mac, or connect a provider for semantic search and question drafts.
 
 ## Why I built it
 
@@ -34,13 +34,15 @@ On Windows, `py -3 run.py --open` may be the Python command. If a browser does n
 
 Choose **Explore the example**, then **Try the example archive**. Search for “volunteer orientation” or “protect eyes while soldering,” open a source passage, and explore the transcript. The six example recordings are original sample material written for this project. Their vectors are a transparent demonstration fixture, so this path shows the experience without claiming to measure a real embedding model.
 
-To use your own material, start a separate workspace and choose **Use your own content**:
+To use your own material, start a separate workspace:
 
 ```sh
 python3 run.py --data-dir ./build/my-archive --open
 ```
 
-Connect an OpenAI API key, upload one recording or WebVTT transcript, review the processing scope, and start the import. Your own content uses paid API calls. Audio imports also need FFmpeg with `ffprobe`. Playlist discovery needs a YouTube Data API key. [The first run guide](docs/FIRST_RUN.md) walks through accounts, file limits, and setup issues.
+Choose **Use Whisper on this Mac** for local transcription and keyword search with no AI provider account. Install `whisper.cpp`, FFmpeg, and a model using [the Mac setup guide](docs/LOCAL_WHISPER.md). The app checks those prerequisites before processing media.
+
+Choose **Use your own content** for cloud transcription, semantic search, and optional question drafts. Connect an OpenAI API key, upload a recording or WebVTT transcript, review the processing scope, and start the import. This path uses paid API calls. Audio imports need FFmpeg with `ffprobe`. Playlist discovery in either path needs a YouTube Data API key. [The first run guide](docs/FIRST_RUN.md) covers accounts, file limits, and setup issues.
 
 ## Systems worth exploring
 
@@ -48,14 +50,14 @@ Connect an OpenAI API key, upload one recording or WebVTT transcript, review the
 | :--- | :--- | :--- |
 | Guided onboarding | Checks Python, storage, media tools, and selected connections | A new user can understand what is required before starting paid work |
 | Source discovery | Parses individual videos, pages, and up to 100 playlist entries | Discovery and selection happen before processing |
-| Timed transcription | Accepts uploaded media or WebVTT and preserves source timestamps | A search result can lead back to the relevant moment |
+| Timed transcription | Accepts uploaded media or WebVTT; can run Whisper locally on a Mac | A search result can lead back to the relevant moment |
 | Resumable import | Gives jobs stable identities and saves completed stages | An interrupted archive import can resume without rebuilding every completed step |
 | Incremental index | Hashes passages and embeds only changed content | Repeated imports avoid unnecessary model calls |
-| Hybrid retrieval | Combines keyword and vector rankings with source context | People can search by wording or related meaning; keyword search remains available if vector search fails |
+| Search modes | Combines keyword and vector rankings in the cloud path; uses keywords in local mode | Readers can choose meaning based retrieval or keep processing on their computer |
 | Grounded drafts | Requires an exact excerpt from the cited transcript cue | Unsupported draft answers are rejected before review |
 | Local controls | Keeps entered keys in server memory, restricts web discovery, and protects local API requests | The setup experience has explicit boundaries around credentials and fetched pages |
 
-The app uses Python's standard library, a small HTML and JavaScript interface, OpenAI transcription and embeddings for real content, and optional YouTube Data API discovery. It stores the archive in local JSON files. There is no hosted account or database to configure.
+The app uses Python's standard library and a small HTML and JavaScript interface. Real content can use local `whisper.cpp` transcription with keyword search, or OpenAI transcription and embeddings for semantic search. YouTube Data API discovery is optional. It stores the archive in local JSON files. There is no hosted account or database to configure.
 
 ## How it fits together
 
@@ -74,12 +76,12 @@ Some of the most important product decisions are invisible in a happy path. Raw 
 
 ## What this version proves
 
-The example setup, import, archive, and search flow passed a local HTTP check. The project has 42 automated tests covering retrieval, source validation, provider failures, job recovery, and credential handling. Run them with:
+The example setup, import, archive, and search flow passed a local HTTP check. The project has 47 automated tests covering retrieval, source validation, provider failures, job recovery, and credential handling. Run them with:
 
 ```sh
 python3 -m unittest discover -s tests -v
 ```
 
-The paid provider paths and live YouTube account connection have mock coverage but have not been exercised with real credentials in this reconstruction. The example vectors and queries are development fixtures, not an independent search quality benchmark. Question excerpts are checked for source presence, which still leaves interpretation to a person. This is a local single user application, not a hosted service.
+The paid provider paths, live YouTube account connection, and local Whisper command on a Mac have mock coverage but have not been exercised with real accounts or Mac hardware in this reconstruction. The example vectors and queries are development fixtures, not an independent search quality benchmark. Question excerpts are checked for source presence, which still leaves interpretation to a person. This is a local single user application, not a hosted service.
 
 This repo contains newly reconstructed code and original sample transcripts. It does not contain private recordings, customer data, credentials, or copied private source code. Coding agents assisted with this reconstruction. No open source license grant is included; contact me about broader reuse.

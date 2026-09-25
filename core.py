@@ -78,6 +78,12 @@ class FixtureEmbedder:
    result.append(normalize(v+extra))
   return result
 
+class LocalKeywordEmbedder:
+ signature='local-keyword-v1'
+ def embed(self,texts):
+  # Keep the index format consistent. Local mode queries the lexical lane only.
+  return [[0.0] for _ in texts]
+
 class OpenAIEmbedder:
  def __init__(self,key,model='text-embedding-3-small',transport=None,sleep=time.sleep):
   if not key:raise ValueError('OPENAI_API_KEY required')

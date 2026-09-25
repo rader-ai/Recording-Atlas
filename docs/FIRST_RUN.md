@@ -4,7 +4,11 @@
 
 Run python3 run.py --open from the project folder. Select Explore the example and click Try the example archive. The server indexes six original sample transcripts. Open the archive and search for a topic. Expand a transcript to inspect its source passages. No paid calls occur in this mode.
 
-## Process your first recording
+## Keep processing local on a Mac
+
+Use a new data directory, then choose **Use Whisper on this Mac**. Follow [the Mac setup guide](LOCAL_WHISPER.md) to install `whisper.cpp`, FFmpeg, and a compatible model. The application shows which prerequisites are ready. Upload a WebVTT transcript or a recording you can use. This mode transcribes locally and searches by keyword. It does not send the recording or search query to an AI provider.
+
+## Process your first recording with a provider
 
 Start a different data directory if you already loaded the example. Choose Use your own content and enter an OpenAI API key. Save connections. A connection check verifies access but does not prove billing or every model permission.
 
@@ -30,7 +34,7 @@ No website videos found: only ordinary links and embeds in the fetched HTML are 
 
 Captions missing: upload an exported WebVTT transcript or the source recording. This release does not acquire YouTube captions automatically.
 
-File too large: compress or export a smaller media file, or supply WebVTT. Maximum upload is 20 MB, media duration 90 minutes. Overlapping WebVTT cues need normalization before import.
+File too large: compress or export a smaller media file, or supply WebVTT. Maximum upload is 20 MB in OpenAI mode or 50 MB in local mode. Media duration is limited to 90 minutes. Overlapping WebVTT cues need normalization before import.
 
 Provider mode cannot change: start with a different --data-dir. Example vectors are intended only for demonstration transcripts.
 

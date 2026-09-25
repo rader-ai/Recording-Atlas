@@ -14,7 +14,7 @@ Code reviewed for this reconstruction explains two specific needs: older audio h
 
 The public reconstruction adds an onboarding experience so someone else can configure the needed services and process a first recording. Setup explains requirements and data movement. Discovery identifies recordings before paid processing. Saved jobs allow recovery. Archive views preserve source context, and draft answers quote source passages for review.
 
-The local example path offers a way to inspect the product without credentials. The real content path uses provider adapters and requires the user's own API access. The reconstruction is smaller than the original and does not imply the same deployment scale or feature completeness.
+The local example path offers a way to inspect the product without credentials. Real content can use local Whisper transcription and keyword search without an AI provider account, or provider transcription, semantic search, and question drafts with the user's API access. The reconstruction is smaller than the original and does not imply the same deployment scale or feature completeness.
 
 ## Product decisions on display
 

@@ -3,11 +3,13 @@ import argparse, base64, hashlib, json, os, secrets, shutil, subprocess, sys, te
 from pathlib import Path
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlsplit, parse_qs
-from core import FixtureEmbedder, OpenAIEmbedder, Indexer, Search, save_atomic, validate_docs
+from core import FixtureEmbedder, LocalKeywordEmbedder, OpenAIEmbedder, Indexer, Search, save_atomic, validate_docs
 from import_vtt import parse_vtt
 from connectors import discover, transcribe, questions, request_json
+from local_whisper import prerequisites, transcribe_local
 ROOT=Path(__file__).resolve().parent
 MAX_FILE=20_000_000
+MAX_LOCAL_FILE=50_000_000
 
 class Workspace:
     def __init__(self,path):
@@ -24,12 +26,16 @@ class Workspace:
     def write(self,name,data):save_atomic(self.path/name,data)
     def jobs(self):return [json.loads(p.read_text()) for p in sorted(self.path.glob('job_*.json'),key=lambda p:p.stat().st_mtime,reverse=True)]
     def docs(self):return self.read('documents.json',[])
-    def provider(self):return FixtureEmbedder() if self.state['provider']=='fixture' else OpenAIEmbedder(self.keys['openai'])
+    def provider(self):
+        if self.state['provider']=='fixture':return FixtureEmbedder()
+        if self.state['provider']=='local':return LocalKeywordEmbedder()
+        return OpenAIEmbedder(self.keys['openai'])
     def index_name(self):return 'index_'+self.state['provider']+'.json'
     def status(self):
         return {'configured':self.state['configured'],'provider':self.state['provider'],'connections':{k:{'configured':bool(v),'verified':self.verified.get(k,False)} for k,v in self.keys.items()},
                 'runtime':sys.version.split()[0],'platform':sys.platform,'free_gb':round(shutil.disk_usage(self.path).free/1e9,1),
-                'ffprobe':bool(shutil.which('ffprobe')),'documents':len(self.docs()),'jobs':self.jobs(),'model':self.model}
+                'ffprobe':bool(shutil.which('ffprobe')),'local':prerequisites(),
+                'documents':len(self.docs()),'jobs':self.jobs(),'model':self.model}
     def configure(self,data):
         with self.lock:
             if self.worker and self.worker.is_alive():raise ValueError('Wait for the current import before changing settings.')
@@ -39,7 +45,7 @@ class Workspace:
                     if not isinstance(key,str) or len(key)>500 or any(c.isspace() for c in key):raise ValueError('Invalid credential format.')
                     self.keys[name]=key;self.verified[name]=False
             provider=data.get('provider',self.state['provider'])
-            if provider not in ('fixture','openai'):raise ValueError('Unknown processing mode.')
+            if provider not in ('fixture','openai','local'):raise ValueError('Unknown processing mode.')
             if provider=='openai' and not self.keys['openai'] and not (self.state['configured'] and self.state['provider']=='openai'):raise ValueError('Add your OpenAI API key or choose example mode.')
             if provider!=self.state['provider'] and self.docs():raise ValueError('This archive already has a search mode. Use a separate data directory to change it.')
             self.state.update(configured=True,provider=provider);self.write('state.json',self.state)
@@ -57,8 +63,9 @@ class Workspace:
             if self.worker and self.worker.is_alive():raise ValueError('An import is already running.')
             if not self.state['configured']:raise ValueError('Complete setup first.')
             example=data.get('example') is True
-            if not example and self.state['provider']=='fixture':raise ValueError('Example vectors are only suitable for supplied examples. Start a separate workspace with OpenAI for your own content.')
-            if data.get('paid') is not True and not example:raise ValueError('Confirm paid processing before importing your content.')
+            if not example and self.state['provider']=='fixture':raise ValueError('Example vectors are only suitable for supplied examples. Start a separate workspace for your own content.')
+            if data.get('paid') is not True and not example and self.state['provider']=='openai':raise ValueError('Confirm paid processing before importing your content.')
+            if data.get('questions') and self.state['provider']=='local':raise ValueError('Question drafting requires the OpenAI mode. Local mode provides transcription and keyword search.')
             title=str(data.get('title','')).strip()[:200]
             if not example and not title:raise ValueError('Give this recording a title.')
             source=str(data.get('source','')).strip()
@@ -69,7 +76,8 @@ class Workspace:
                 if extension not in ('.vtt','.mp3','.m4a','.wav','.mp4','.webm'):raise ValueError('Upload WebVTT, MP3, M4A, WAV, MP4, or WebM.')
                 try:blob=base64.b64decode(data.get('file',''),validate=True)
                 except Exception:raise ValueError('Invalid upload.') from None
-                if not 0<len(blob)<=MAX_FILE:raise ValueError('Upload must be between 1 byte and 20 MB.')
+                limit=MAX_LOCAL_FILE if self.state['provider']=='local' else MAX_FILE
+                if not 0<len(blob)<=limit:raise ValueError(f'Upload must be between 1 byte and {limit//1_000_000} MB in this mode.')
                 if extension!='.vtt' and not shutil.which('ffprobe'):raise ValueError('Audio requires FFmpeg with ffprobe. Install it or upload a WebVTT transcript.')
             identity=hashlib.sha256(blob+json.dumps({'title':title,'source':source,'example':example,'questions':bool(data.get('questions')),'provider':self.state['provider'],'model':self.model,'pipeline':1},sort_keys=True).encode()).hexdigest()[:24]
             old=self.read('job_'+identity+'.json')
@@ -102,14 +110,18 @@ class Workspace:
             if raw is None:
                 if job['example']:raw=json.loads((ROOT/'data/transcripts.json').read_text())
                 else:
-                    stage('transcription','Checking media duration before sending audio.')
+                    stage('transcription','Checking media duration before transcription.')
                     file=self.path/('upload_'+jid+job['extension'])
                     probe=subprocess.run(['ffprobe','-v','error','-show_entries','format=duration','-of','json',str(file)],capture_output=True,timeout=20)
                     try:duration=float(json.loads(probe.stdout)['format']['duration'])
                     except Exception:raise ValueError('Could not read media duration. Export a standard audio file or upload WebVTT.') from None
                     if not 0<duration<=5400:raise ValueError('Recording must be no longer than 90 minutes.')
                     stage('transcription','Transcribing with timestamps. This may take several minutes.')
-                    raw=[{'id':jid,'title':job['title'],'source':job['source'],'cues':transcribe(file.read_bytes(),job['extension'],self.keys['openai'])}]
+                    if self.state['provider']=='local':
+                        needed=int(duration*32000)+50_000_000
+                        if shutil.disk_usage(self.path).free<needed:raise ValueError('Not enough disk space for a temporary 16 kHz WAV file.')
+                        raw=[transcribe_local(file,jid,job['title'],self.path)]
+                    else:raw=[{'id':jid,'title':job['title'],'source':job['source'],'cues':transcribe(file.read_bytes(),job['extension'],self.keys['openai'])}]
                 validate_docs(raw);self.write('raw_'+jid+'.json',raw)
             if 'transcription' not in job['completed']:job['completed'].append('transcription')
             stage('archive','Preserving the raw transcript and building a readable archive.')
@@ -134,7 +146,7 @@ class Workspace:
     def query(self,q):
         index=self.read(self.index_name())
         if not index:raise ValueError('Import a recording first.')
-        return Search(index,self.provider()).query(q)
+        return Search(index,self.provider()).query(q,'lexical' if self.state['provider']=='local' else 'hybrid')
     def archive(self):
         return {'documents':self.docs(),'drafts':[{'title':j['title'],'items':self.read('draft_'+j['id']+'.json',[])} for j in self.jobs() if j['questions']]}
 
@@ -171,7 +183,7 @@ def serve(workspace,port,open_browser=False):
             if not gate.acquire(blocking=False):self.send(429,{'error':'Too many requests. Try again shortly.'});return
             try:
                 size=int(self.headers.get('Content-Length','0'))
-                if not 0<size<=28_000_000:raise ValueError('Request exceeds upload limit.')
+                if not 0<size<=70_000_000:raise ValueError('Request exceeds upload limit.')
                 data=json.loads(self.rfile.read(size))
                 if not isinstance(data,dict):raise ValueError('Object required.')
                 route=urlsplit(self.path).path

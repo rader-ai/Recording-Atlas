@@ -20,7 +20,7 @@ This is a deliberate recovery design, with a specific limit: if a provider retur
 
 ## 3. Timestamps make retrieval useful
 
-For media input, `transcribe` in [connectors.py](../connectors.py) requests timed segments. For an existing WebVTT transcript, [import_vtt.py](../import_vtt.py) validates ordered cues. `chunk_document` in [core.py](../core.py) groups cues into overlapping passages while retaining source start and end times.
+For cloud media input, `transcribe` in [connectors.py](../connectors.py) requests timed segments. In local mode, [local_whisper.py](../local_whisper.py) converts audio and runs `whisper-cli` to produce a VTT transcript. For an existing WebVTT transcript, [import_vtt.py](../import_vtt.py) validates ordered cues. `chunk_document` in [core.py](../core.py) groups cues into overlapping passages while retaining source start and end times.
 
 The archive stores raw and readable transcripts separately. The current readable cleanup only normalizes spacing; it does not use a model to silently rewrite the speaker. A search hit includes the passage and timestamp so someone can inspect the context.
 
@@ -34,7 +34,7 @@ This protects the previous index from an incomplete build. It does not make the 
 
 `Search.query` in [core.py](../core.py) runs keyword and vector search concurrently, combines their rankings, and returns the strongest passage per document. If the vector provider fails, the query can still return keyword results. `validate_excerpt` checks whether quoted text exists in the passage.
 
-The example uses a transparent concept vector fixture to demonstrate the flow without credentials. It is not a pretrained model. The authored query set in [data/queries.json](../data/queries.json) is useful for development but is not an independent quality benchmark. The real content path uses the configured embedding provider.
+The example uses a transparent concept vector fixture to demonstrate the flow without credentials. It is not a pretrained model. The authored query set in [data/queries.json](../data/queries.json) is useful for development but is not an independent quality benchmark. The OpenAI content path uses the configured embedding provider. The Mac path uses local keyword search without semantic vectors.
 
 ## 6. Question drafts have a source check and a human checkpoint
 
@@ -49,6 +49,6 @@ python3 -m unittest discover -s tests -v
 node --check web/onboarding.js
 ```
 
-The repository also has a GitHub workflow for a clean checkout on Python 3.11 and 3.12. The tests use mocks for paid APIs. A live authorized recording import is still needed before claiming the paid path works end to end.
+The repository also has a GitHub workflow for a clean checkout on Python 3.11 and 3.12. Local Whisper is tested with simulated command output; a real Mac run remains to be verified. The tests use mocks for paid APIs. A live authorized recording import is still needed before claiming the paid path works end to end.
 
 For the product story, read [the case study](CASE_STUDY.md). For a new user, start with [the first run guide](FIRST_RUN.md).
