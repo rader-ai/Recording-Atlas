@@ -4,9 +4,16 @@ Recording Atlas can transcribe an uploaded recording with `whisper.cpp` on your 
 
 ## Set up once
 
-1. Install Python 3.11 or newer and FFmpeg. Confirm `python3 --version`, `ffmpeg -version`, and `ffprobe -version` work in Terminal.
-2. Install `whisper.cpp` from [the official project](https://github.com/ggml-org/whisper.cpp). Build its `whisper-cli` command using the upstream instructions. Place the resulting command on your PATH, or set `WHISPER_CLI_PATH` to its full path.
-3. Download a compatible `ggml` model using [the project's model instructions](https://github.com/ggml-org/whisper.cpp/blob/master/models/README.md). Start with an English model for English recordings, such as `ggml-base.en.bin`. Larger models need more memory, disk space, and processing time. Set `WHISPER_MODEL_PATH` to the downloaded file's full path.
+1. Install Python 3.11 or newer. If you have Homebrew, install the two media tools with:
+
+```sh
+brew install ffmpeg whisper.cpp
+```
+
+Homebrew provides `ffmpeg`, `ffprobe`, and `whisper-cli`. Confirm `python3 --version`, `ffprobe -version`, and `whisper-cli --help` work in Terminal. You can also [build whisper.cpp from source](https://github.com/ggml-org/whisper.cpp) instead of using Homebrew.
+
+2. Download a compatible `ggml` model using [the project's model instructions](https://github.com/ggml-org/whisper.cpp/blob/master/models/README.md). Start with an English model for English recordings, such as `ggml-base.en.bin`. Larger models need more memory, disk space, and processing time. The Homebrew package does not include the model.
+3. Set `WHISPER_MODEL_PATH` to the model file's full path. If `whisper-cli` is not on PATH, set `WHISPER_CLI_PATH` to its executable path.
 4. Launch Recording Atlas with a new workspace. Environment variables must be set in the same Terminal session that starts the app:
 
 ```sh
