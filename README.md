@@ -1,20 +1,28 @@
 # Recording Atlas
 
-A local content archive application by Chris Rader, reconstructed with coding agent assistance from patterns in his private church projects.
+**Make recorded knowledge findable again.**
 
-**Turn recorded talks into searchable transcripts and source linked question drafts.**
+Recording Atlas turns a recording into a timed transcript, a searchable archive, and draft questions that point back to the speaker's words. It runs on your computer and guides you through setup. You can explore an example without creating an account.
 
-[First run guide](docs/FIRST_RUN.md) · [Product case study](docs/CASE_STUDY.md) · [Architecture](docs/ARCHITECTURE.md) · [Evaluation](docs/EVALUATION.md)
+## Why I built it
 
-## Why this exists
+My church had years of recorded sermons. The teaching was there, but finding a specific idea often meant knowing which recording to open and listening through it. Older recordings had very little searchable text. I wanted each sermon to keep helping people after the day it was delivered.
 
-Years of recorded teaching can be difficult to find or reuse. Chris built a pipeline to recover that value: transcribe recordings, preserve their context, create a text archive, and make relevant passages easier to discover. This public reconstruction lets another person try those ideas with their own content.
+The original project grew into a content pipeline: transcribe the audio, preserve the source, prepare readable text, divide it into passages, make those passages searchable, and create questions and answers that could be checked against the teaching. Recording Atlas is a smaller public reconstruction of those ideas, built so someone else can try the workflow with their own material.
 
-The application opens with guided setup. It explains accounts, checks the computer, accepts source references and uploads, processes a recording, and provides searchable passages and draft questions with source excerpts.
+## What you can do
 
-## Start
+1. **Find a recording.** Paste a video, playlist, or website URL to collect recording references. You can also go straight to an upload.
+2. **Add the source material.** Upload a timed WebVTT transcript or a supported audio or video file that you have permission to use.
+3. **Build an archive.** The app keeps the raw transcript, prepares a readable version, and indexes passages with timestamps.
+4. **Search and inspect.** Search by words or meaning and read the surrounding source passage.
+5. **Review question drafts.** Optional generated questions use exact transcript excerpts as draft answers. You decide whether they represent the speaker faithfully.
 
-Requires Python 3.11 or newer and a browser. No Python packages need installation.
+A link identifies a recording. To process it, you still need to upload its media or transcript. This version does not download YouTube audio or captions.
+
+## Try the experience
+
+You need Python 3.11 or newer and a browser. The example does not require API keys, a database, or a model download.
 
 ```sh
 git clone https://github.com/rader-ai/Recording-Atlas.git
@@ -22,73 +30,56 @@ cd Recording-Atlas
 python3 run.py --open
 ```
 
-On Windows, use `py -3 run.py --open` if Python is installed through the Windows launcher. Open the exact local address printed in the terminal. The default is http://127.0.0.1:8765.
+On Windows, `py -3 run.py --open` may be the Python command. If a browser does not open, visit the local address printed in your terminal.
 
-Choose **Explore the example**, then **Try the example archive**. No accounts, model downloads, or paid calls are needed. Sample transcripts were written for this project and use demonstration vectors, not a trained semantic model.
+Choose **Explore the example**, then **Try the example archive**. Search for “volunteer orientation” or “protect eyes while soldering,” open a source passage, and explore the transcript. The six example recordings are original sample material written for this project. Their vectors are a transparent demonstration fixture, so this path shows the experience without claiming to measure a real embedding model.
 
-For your own content, start a separate workspace so real and example indexes remain distinct:
+To use your own material, start a separate workspace and choose **Use your own content**:
 
 ```sh
 python3 run.py --data-dir ./build/my-archive --open
 ```
 
-Choose **Use your own content**, connect an OpenAI API key, and import one transcript or recording. Processing mode cannot change after an archive contains documents. API calls use your account and can incur charges. Search queries also incur embedding usage.
+Connect an OpenAI API key, upload one recording or WebVTT transcript, review the processing scope, and start the import. Your own content uses paid API calls. Audio imports also need FFmpeg with `ffprobe`. Playlist discovery needs a YouTube Data API key. [The first run guide](docs/FIRST_RUN.md) walks through accounts, file limits, and setup issues.
 
-## Requirements and accounts
+## Systems worth exploring
 
-| Capability | Requirements |
-| :--- | :--- |
-| Example archive | Python 3.11+, browser, writable storage; no accounts |
-| Your own WebVTT transcript | OpenAI API key with billing and embedding model access |
-| Audio or video transcription | The above plus FFmpeg with ffprobe on PATH and access to whisper-1 |
-| Draft questions | OpenAI access to the text model, default gpt-4.1-mini |
-| Playlist discovery | Google project with YouTube Data API v3 enabled and an API key |
-| Single YouTube reference or website discovery | No Google key; network access for website discovery |
-| Hosting or database | Not required; this version runs locally and stores JSON on disk |
+| System | What it does | Why it matters |
+| :--- | :--- | :--- |
+| Guided onboarding | Checks Python, storage, media tools, and selected connections | A new user can understand what is required before starting paid work |
+| Source discovery | Parses individual videos, pages, and up to 100 playlist entries | Discovery and selection happen before processing |
+| Timed transcription | Accepts uploaded media or WebVTT and preserves source timestamps | A search result can lead back to the relevant moment |
+| Resumable import | Gives jobs stable identities and saves completed stages | An interrupted archive import can resume without rebuilding every completed step |
+| Incremental index | Hashes passages and embeds only changed content | Repeated imports avoid unnecessary model calls |
+| Hybrid retrieval | Combines keyword and vector rankings with source context | People can search by wording or related meaning; keyword search remains available if vector search fails |
+| Grounded drafts | Requires an exact excerpt from the cited transcript cue | Unsupported draft answers are rejected before review |
+| Local controls | Keeps entered keys in server memory, restricts web discovery, and protects local API requests | The setup experience has explicit boundaries around credentials and fetched pages |
 
-The interface includes links to Python, FFmpeg, API key setup, and Google Cloud. Configure accounts only for the features you need. Keys entered in the browser go to the local server and stay in server memory. They are never written to application files or returned by status endpoints. They must be reentered after restart. Alternatively provide OPENAI_API_KEY and YOUTUBE_API_KEY through your shell or secret manager. Never commit them. This application does not read .env files.
+The app uses Python's standard library, a small HTML and JavaScript interface, OpenAI transcription and embeddings for real content, and optional YouTube Data API discovery. It stores the archive in local JSON files. There is no hosted account or database to configure.
 
-An optional CIL_TEXT_MODEL environment variable selects another compatible JSON capable Chat Completions model. Model access and billing are only proven by a successful real operation. The connection check validates access without running a paid model test.
+## How it fits together
 
-## What works in this version
+```mermaid
+flowchart TD
+    A["Choose a recording"] --> B["Upload media or WebVTT"]
+    B --> C["Timed transcript and text archive"]
+    C --> D["Overlapping passages"]
+    D --> E["Keyword and vector search"]
+    C --> F["Source grounded question drafts"]
+    E --> G["Inspect source context"]
+    F --> G
+```
 
-1. First launch setup with runtime, storage, and media tool checks.
-2. Example archive requiring no accounts.
-3. Video reference parsing, playlist discovery up to 100 entries, and YouTube link discovery from one public HTTPS page, up to 50 videos.
-4. Uploaded WebVTT transcripts or MP3, M4A, WAV, MP4, and WebM media up to 20 MB. Audio duration is checked before transcription and must be 90 minutes or less.
-5. Timestamped cloud transcription, raw transcript preservation, spacing cleanup, incremental embeddings, and combined keyword and vector retrieval.
-6. Optional questions answered with exact source excerpts. The application verifies the excerpt exists at the cited cue. Human review is still required.
-7. Resumable jobs, source archive inspection, connection replacement, session key clearing, and JSON export.
+Some of the most important product decisions are invisible in a happy path. Raw and readable transcripts are separate so cleanup does not silently replace the source. The index is saved only after a complete build. Draft answers quote an exact cue and remain unpublished. The app asks for accounts only when a selected feature needs them. [The case study](docs/CASE_STUDY.md) explains the original opportunity and the decisions behind this reconstruction. [Architecture](docs/ARCHITECTURE.md) and [evaluation](docs/EVALUATION.md) cover the implementation and its evidence limits.
 
-Paste a link, select a discovered recording, and attach its transcript or media. Link discovery does not automatically download YouTube media or captions. Official caption downloads require additional authorization and video permissions. OAuth connection and caption acquisition are not implemented. Website discovery does not run JavaScript or crawl additional pages.
+## What this version proves
 
-Question drafts are limited to 60,000 transcript characters. Each indexing operation accepts at most 300,000 changed input characters. These are processing limits, not guaranteed dollar caps. Duration and dollar cost are not known from a selected file in the browser; the UI says so explicitly. Compress large media or provide an exported WebVTT transcript.
-
-## Recovery and data
-
-State lives outside the repository by default, under ~/.local/share/content-intelligence-lab. A supplied --data-dir changes that location. The program restricts new file permissions where the operating system supports it. It does not encrypt the archive at rest.
-
-Raw transcripts and readable normalized transcripts are stored separately. There is no automated rewriting or correction of the speaker's teaching. Completed transcription and index outputs are reused when an import resumes. A crash before a stage is committed can repeat that stage, including paid calls. Interrupted or timed out provider calls may still be billed.
-
-Question generation failure leaves the transcript and search archive available. Resume after resolving the error. Already completed imports are identified by their content and settings to avoid accidental repeats.
-
-Only run one application process per data directory. Stop the application before backing up or deleting that directory. Export JSON includes readable transcripts and question drafts; a full directory backup also preserves uploads, raw transcripts, index, and job state. Keep backups private.
-
-## Validation and limitations
-
-42 automated tests pass on Python 3.12 on Linux. An HTTP smoke test covers setup, example import, archive, search, static assets, and rejection of requests missing the setup token. JavaScript passes Node syntax checking.
-
-Provider behavior, transcript import, failure recovery, source validation, and playlist pagination have mocked test coverage. No paid provider calls or live YouTube account integrations were executed during preparation. Windows and macOS behavior, browser visual layout, and large media performance have not been verified. No universal RAM or speed guarantee is claimed. Cloud processing does not require a GPU; the implementation buffers uploaded media, so it is intended for small local imports.
-
-This is a single user local application, not a hosted service. It binds only to 127.0.0.1, checks Host and Origin, requires a setup token, and restricts website fetches to validated public HTTPS destinations. It has no hosted user accounts, OAuth, local speech model setup, production queue, multi tenant isolation, or publication workflow. Do not expose it through a public tunnel.
-
-No private recordings, credentials, database exports, source code, or repository history are included. This repository is a portfolio reconstruction. No open source license grant is included; contact the author about broader reuse.
-
-## Development
+The example setup, import, archive, and search flow passed a local HTTP check. The project has 42 automated tests covering retrieval, source validation, provider failures, job recovery, and credential handling. Run them with:
 
 ```sh
 python3 -m unittest discover -s tests -v
-node --check web/onboarding.js
 ```
 
-The earlier retrieval demo remains available through lab.py. Its original instructions are in docs/RETRIEVAL_DEMO.md. See docs/FIRST_RUN.md for the onboarding walkthrough and docs/CASE_STUDY.md for the product narrative.
+The paid provider paths and live YouTube account connection have mock coverage but have not been exercised with real credentials in this reconstruction. The example vectors and queries are development fixtures, not an independent search quality benchmark. Question excerpts are checked for source presence, which still leaves interpretation to a person. This is a local single user application, not a hosted service.
+
+This repo contains newly reconstructed code and original sample transcripts. It does not contain private recordings, customer data, credentials, or copied private source code. Coding agents assisted with this reconstruction. No open source license grant is included; contact me about broader reuse.
