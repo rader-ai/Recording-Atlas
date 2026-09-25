@@ -70,7 +70,7 @@ flowchart TD
     F --> G
 ```
 
-Some of the most important product decisions are invisible in a happy path. Raw and readable transcripts are separate so cleanup does not silently replace the source. The index is saved only after a complete build. Draft answers quote an exact cue and remain unpublished. The app asks for accounts only when a selected feature needs them. [The case study](docs/CASE_STUDY.md) explains the original opportunity and the decisions behind this reconstruction. [Architecture](docs/ARCHITECTURE.md) and [evaluation](docs/EVALUATION.md) cover the implementation and its evidence limits.
+Some of the most important product decisions are invisible in a happy path. Raw and readable transcripts are separate so cleanup does not silently replace the source. The index is saved only after a complete build. Draft answers quote an exact cue and remain unpublished. The app asks for accounts only when a selected feature needs them. [The case study](docs/CASE_STUDY.md) explains the original opportunity and the decisions behind this reconstruction. [the guided code tour](docs/ENGINEERING_WALKTHROUGH.md), [architecture](docs/ARCHITECTURE.md), and [evaluation](docs/EVALUATION.md) cover the implementation and its evidence limits.
 
 ## What this version proves
 
