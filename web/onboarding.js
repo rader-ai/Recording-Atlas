@@ -4,7 +4,7 @@ function notice(message,error=false){$('notice').hidden=false;$('notice').textCo
 async function api(path,data){const options={headers:{'X-Setup-Token':token}};if(data!==undefined){options.method='POST';options.headers['Content-Type']='application/json';options.body=JSON.stringify(data)}const r=await fetch('/api/'+path,options);const result=await r.json();if(!r.ok)throw Error(result.error||'Request failed');return result}
 async function action(fn){try{await fn()}catch(e){notice(e.message,true)}}
 function updateMode(){const chosen=document.querySelector('[name=provider]:checked').value;
- $('localSetup').hidden=chosen!=='local';
+ $('localSetup').hidden=chosen!=='local';$('cloudKey').hidden=chosen==='local';$('cloudKeyHelp').hidden=chosen==='local';$('verifyOpenai').hidden=chosen==='local';
  const mode=state?.configured?state.provider:chosen;
  $('draftOptions').hidden=mode==='local';if(mode==='local')$('questions').checked=false;
  $('consentText').textContent=mode==='local'?'I can use this content. Local transcription and keyword search stay on this computer.':'I can use this content and approve sending it to OpenAI for paid processing.';
